@@ -1,7 +1,9 @@
 use std::fmt::Debug;
 
+pub mod error;
 pub mod language;
 
+use error::Error;
 use language::Language;
 
 #[derive(Default)]
@@ -56,7 +58,7 @@ impl<L: Language> TuringMachine<L> {
 
         // Ensure that we cannot move off the tape.
         if direction == Direction::Left && self.tape_head == 0 {
-            return Err(Error::EndOfTapeReached);
+            return Err(Error::new(error::Type::EndOfTapeReached));
         }
         match direction {
             Direction::Left => self.tape_head -= 1,
@@ -154,12 +156,13 @@ impl<L: Language> TransitionTable<L> {
         state: usize,
         value: L,
     ) -> Result<&Transition<L>, Error> {
+        // TODO: Perform table checking for these issues at the start.
         // Dont return the value early, we must check it is deterministic.
         let mut next_transition = None;
         for transition in &self.transitions {
             if transition.from == state && transition.read == value {
                 if next_transition.is_some() {
-                    return Err(Error::NonDeterministicError);
+                    return Err(Error::new(error::Type::NonDeterministic));
                 }
                 next_transition = Some(transition);
             }
@@ -168,7 +171,7 @@ impl<L: Language> TransitionTable<L> {
         if let Some(next) = next_transition {
             return Ok(next);
         }
-        Err(Error::NoStateFound)
+        Err(Error::new(error::Type::NoStateFound))
     }
 }
 
@@ -197,11 +200,4 @@ impl<L: Language> Transition<L> {
 pub enum Direction {
     Left,
     Right,
-}
-
-#[derive(Debug)]
-pub enum Error {
-    NonDeterministicError,
-    NoStateFound,
-    EndOfTapeReached,
 }

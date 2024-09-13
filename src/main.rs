@@ -14,6 +14,7 @@ impl universal_turing_machine::language::Language for Language {
 }
 
 fn main() {
+    // TODO: Make this cli to the actual lib so i can give it a transition table file or just some string encoding a table.
     let transitions = [
         Transition::new(0, 0, Language::A, Language::A, Direction::Right),
         Transition::new(0, 2, Language::B, Language::A, Direction::Right),
@@ -40,7 +41,7 @@ fn main() {
             dbg!(result);
         }
         Err(err) => {
-            dbg!(err);
+            println!("{err}");
         }
     };
 }
