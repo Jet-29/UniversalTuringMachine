@@ -76,13 +76,8 @@ impl<L: Language> TuringMachine<L> {
             self.step()?;
         }
 
-        let result_length = (1..=self.tape.get_current_length())
-            .rev()
-            .find(|&idx| self.tape.read_single(idx - 1) != L::empty())
-            .unwrap_or(1);
-
         // Return the result
-        Ok((self.tape.read_slice(0, result_length), self.steps))
+        Ok((self.tape.read_slice(0, self.tape.get_length()), self.steps))
     }
 }
 
@@ -125,8 +120,16 @@ impl<L: Language> Tape<L> {
         &self.internal_tape[offset..(offset + size)]
     }
 
-    fn get_current_length(&self) -> usize {
+    fn get_capacity(&self) -> usize {
         self.internal_tape.len()
+    }
+
+    fn get_length(&self) -> usize {
+        let first_valid_index = (0..self.get_capacity())
+            .rev()
+            .find(|&idx| self.read_single(idx) != L::empty())
+            .unwrap_or(1);
+        first_valid_index + 1
     }
 }
 

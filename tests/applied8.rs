@@ -7,7 +7,7 @@ enum Language {
     Empty,
 }
 
-impl universal_turing_machine::Language for Language {
+impl universal_turing_machine::language::Language for Language {
     fn empty() -> Self {
         Self::Empty
     }
@@ -53,132 +53,73 @@ fn get_expected_steps(input_length: usize) -> usize {
     2 * input_length + 1
 }
 
-#[test]
-fn test_empty() {
+fn check_result(input: &[Language], expected: &[Language]) {
     let mut tm = generate_tm();
-    let input = [Language::Empty];
-    tm.write_to_tape_slice(&input);
+    tm.write_to_tape_slice(input);
     let result = tm.run();
-
     match result {
         Ok((answer, steps)) => {
-            assert_eq!(answer, &[Language::Empty]);
-            assert_eq!(steps, get_expected_steps(0));
+            assert_eq!(answer, expected);
+            assert_eq!(steps, get_expected_steps(input.len()));
         }
-        Err(e) => panic!("Error running machine: {e:?}"),
+        Err(e) => panic!("{e}"),
     }
+}
+
+#[test]
+fn test_empty() {
+    // This will currently fail due to tape length logic.
+    // Will be fixed soon.
+    check_result(&[], &[Language::Empty]);
 }
 
 #[test]
 fn test_a() {
-    let mut tm = generate_tm();
-    let input = [Language::A];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(answer, &[Language::A]);
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(&[Language::A], &[Language::A]);
 }
 
 #[test]
 fn test_b() {
-    let mut tm = generate_tm();
-    let input = [Language::B];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(answer, &[Language::B]);
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(&[Language::B], &[Language::B]);
 }
 
 #[test]
 fn test_ab() {
-    let mut tm = generate_tm();
-    let input = [Language::A, Language::B];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(answer, &[Language::B, Language::A]);
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(&[Language::A, Language::B], &[Language::B, Language::A]);
 }
 
 #[test]
 fn test_baa() {
-    let mut tm = generate_tm();
-    let input = [Language::B, Language::A, Language::A];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(answer, &[Language::A, Language::A, Language::B]);
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(
+        &[Language::B, Language::A, Language::A],
+        &[Language::A, Language::A, Language::B],
+    );
 }
 
 #[test]
 fn test_abba() {
-    let mut tm = generate_tm();
-    let input = [Language::A, Language::B, Language::B, Language::A];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(
-                answer,
-                &[Language::A, Language::B, Language::B, Language::A]
-            );
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(
+        &[Language::A, Language::B, Language::B, Language::A],
+        &[Language::A, Language::B, Language::B, Language::A],
+    );
 }
 
 #[test]
 fn test_babbb() {
-    let mut tm = generate_tm();
-    let input = [
-        Language::B,
-        Language::A,
-        Language::B,
-        Language::B,
-        Language::B,
-    ];
-    tm.write_to_tape_slice(&input);
-    let result = tm.run();
-
-    match result {
-        Ok((answer, steps)) => {
-            assert_eq!(
-                answer,
-                &[
-                    Language::B,
-                    Language::A,
-                    Language::B,
-                    Language::B,
-                    Language::B,
-                ]
-            );
-            assert_eq!(steps, get_expected_steps(input.len()));
-        }
-        Err(e) => panic!("Error running machine: {e:?}"),
-    }
+    check_result(
+        &[
+            Language::B,
+            Language::A,
+            Language::B,
+            Language::B,
+            Language::B,
+        ],
+        &[
+            Language::B,
+            Language::A,
+            Language::B,
+            Language::B,
+            Language::B,
+        ],
+    );
 }
