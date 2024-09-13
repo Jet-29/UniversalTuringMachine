@@ -1,5 +1,9 @@
 use std::fmt::Debug;
 
+pub mod language;
+
+use language::Language;
+
 #[derive(Default)]
 pub struct TuringMachine<L: Language> {
     tape_head: usize,
@@ -200,8 +204,4 @@ pub enum Error {
     NonDeterministicError,
     NoStateFound,
     EndOfTapeReached,
-}
-
-pub trait Language: Copy + PartialEq + Debug {
-    fn empty() -> Self;
 }

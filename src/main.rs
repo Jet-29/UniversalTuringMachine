@@ -7,7 +7,7 @@ enum Language {
     Empty,
 }
 
-impl universal_turing_machine::Language for Language {
+impl universal_turing_machine::language::Language for Language {
     fn empty() -> Self {
         Self::Empty
     }
