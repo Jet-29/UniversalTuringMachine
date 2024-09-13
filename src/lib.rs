@@ -2,22 +2,24 @@ use std::fmt::Debug;
 
 pub mod error;
 pub mod language;
+pub mod transition;
 
 use error::Error;
 use language::Language;
+use transition::Table;
 
 #[derive(Default)]
 pub struct TuringMachine<L: Language> {
     tape_head: usize,
     steps: usize,
     state: usize,
-    table: TransitionTable<L>,
+    table: Table<L>,
     tape: Tape<L>,
 }
 
 impl<L: Language> TuringMachine<L> {
     #[must_use]
-    pub fn new(table: TransitionTable<L>) -> Self {
+    pub fn new(table: Table<L>) -> Self {
         Self {
             tape_head: 0,
             state: 0,
@@ -130,72 +132,6 @@ impl<L: Language> Tape<L> {
             .find(|&idx| self.read_single(idx) != L::empty())
             .unwrap_or(1);
         first_valid_index + 1
-    }
-}
-
-#[derive(Default)]
-pub struct TransitionTable<L: Language> {
-    transitions: Vec<Transition<L>>,
-}
-
-impl<L: Language> TransitionTable<L> {
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            transitions: Vec::new(),
-        }
-    }
-
-    pub fn add_transition(&mut self, transition: Transition<L>) {
-        self.transitions.push(transition);
-    }
-
-    pub fn add_transitions(&mut self, transitions: &[Transition<L>]) {
-        self.transitions.extend_from_slice(transitions);
-    }
-    /// # Errors
-    pub fn get_from_state_and_value(
-        &self,
-        state: usize,
-        value: L,
-    ) -> Result<&Transition<L>, Error> {
-        // TODO: Perform table checking for these issues at the start.
-        // Dont return the value early, we must check it is deterministic.
-        let mut next_transition = None;
-        for transition in &self.transitions {
-            if transition.from == state && transition.read == value {
-                if next_transition.is_some() {
-                    return Err(Error::new(error::Type::NonDeterministic));
-                }
-                next_transition = Some(transition);
-            }
-        }
-
-        if let Some(next) = next_transition {
-            return Ok(next);
-        }
-        Err(Error::new(error::Type::NoStateFound))
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Transition<L: Language> {
-    from: usize,
-    to: usize,
-    read: L,
-    write: L,
-    direction: Direction,
-}
-
-impl<L: Language> Transition<L> {
-    pub fn new(from: usize, to: usize, read: L, write: L, direction: Direction) -> Self {
-        Self {
-            from,
-            to,
-            read,
-            write,
-            direction,
-        }
     }
 }
 

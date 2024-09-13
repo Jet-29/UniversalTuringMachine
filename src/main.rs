@@ -1,4 +1,7 @@
-use universal_turing_machine::{Direction, Transition, TransitionTable, TuringMachine};
+use universal_turing_machine::{
+    transition::{Table, Transition},
+    Direction, TuringMachine,
+};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 enum Language {
@@ -23,7 +26,7 @@ fn main() {
         Transition::new(3, 1, Language::A, Language::Empty, Direction::Right),
     ];
 
-    let mut transition_table: TransitionTable<Language> = TransitionTable::new();
+    let mut transition_table: Table<Language> = Table::new();
 
     transition_table.add_transitions(&transitions);
 
