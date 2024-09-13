@@ -38,6 +38,7 @@ impl<L: Language> Tape<L> {
     }
 
     pub fn write_single(&mut self, pos: usize, value: L) {
+        self.extend_to_fit(pos);
         self.internal_tape[pos] = value;
     }
 
@@ -48,6 +49,9 @@ impl<L: Language> Tape<L> {
 
     #[must_use]
     pub fn read_single(&self, pos: usize) -> L {
+        if self.internal_tape.len() <= pos {
+            return L::empty();
+        }
         self.internal_tape[pos]
     }
 
@@ -59,7 +63,7 @@ impl<L: Language> Tape<L> {
     /// The capacity is the number of symbols on the tape.
     /// This includes all empty symbols.
     #[must_use]
-    fn get_capacity(&self) -> usize {
+    pub fn get_capacity(&self) -> usize {
         self.internal_tape.len()
     }
 

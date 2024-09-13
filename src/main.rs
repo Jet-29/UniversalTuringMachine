@@ -1,6 +1,8 @@
 use universal_turing_machine::{
+    tape::Tape,
     transition::{Table, Transition},
-    Direction, TuringMachine,
+    turing_machine::TuringMachine,
+    Direction,
 };
 
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -29,9 +31,8 @@ fn main() {
     let mut transition_table: Table<Language> = Table::new();
 
     transition_table.add_transitions(&transitions);
-
-    let mut machine = TuringMachine::new(transition_table);
-    machine.write_to_tape_slice(&[
+    let mut tape = Tape::new();
+    tape.set_tape(&[
         Language::A,
         Language::A,
         Language::A,
@@ -39,6 +40,8 @@ fn main() {
         Language::A,
         Language::A,
     ]);
+
+    let mut machine = TuringMachine::new(transition_table, tape);
     match machine.run() {
         Ok(result) => {
             dbg!(result);

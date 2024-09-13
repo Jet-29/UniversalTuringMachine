@@ -1,6 +1,8 @@
 use universal_turing_machine::{
+    tape::Tape,
     transition::{Table, Transition},
-    Direction, TuringMachine,
+    turing_machine::TuringMachine,
+    Direction,
 };
 
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -16,7 +18,7 @@ impl universal_turing_machine::language::Language for Language {
     }
 }
 
-fn generate_tm() -> TuringMachine<Language> {
+fn generate_table() -> Table<Language> {
     let transitions = [
         Transition::new(0, 2, Language::A, Language::Empty, Direction::Right),
         Transition::new(0, 4, Language::B, Language::Empty, Direction::Right),
@@ -48,17 +50,15 @@ fn generate_tm() -> TuringMachine<Language> {
     let mut transition_table: Table<Language> = Table::new();
 
     transition_table.add_transitions(&transitions);
-
-    TuringMachine::new(transition_table)
+    transition_table
 }
 
 fn get_expected_steps(input_length: usize) -> usize {
     2 * input_length + 1
 }
 
-fn check_result(input: &[Language], expected: &[Language]) {
-    let mut tm = generate_tm();
-    tm.write_to_tape_slice(input);
+fn check_result(input: Tape<Language>, expected: Tape<Language>) {
+    let mut tm = TuringMachine::new(generate_table(), input);
     let result = tm.run();
     match result {
         Ok((answer, steps)) => {
