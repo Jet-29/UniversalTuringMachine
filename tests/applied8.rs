@@ -57,72 +57,79 @@ fn get_expected_steps(input_length: usize) -> usize {
     2 * input_length + 1
 }
 
-fn check_result(input: Tape<Language>, expected: Tape<Language>) {
+fn check_result(input: Tape<Language>, expected: &Tape<Language>) {
+    let input_length = input.get_length();
     let mut tm = TuringMachine::new(generate_table(), input);
     let result = tm.run();
     match result {
         Ok((answer, steps)) => {
-            assert_eq!(answer, expected);
-            assert_eq!(steps, get_expected_steps(input.len()));
+            assert_eq!(*answer, *expected, "Compare results");
+            assert_eq!(
+                steps,
+                get_expected_steps(input_length),
+                "Compare number of steps taken"
+            );
         }
         Err(e) => panic!("{e}"),
     }
 }
-
 #[test]
 fn test_empty() {
-    // This will currently fail due to tape length logic.
-    // Will be fixed soon.
-    check_result(&[], &[Language::Empty]);
+    let input = [];
+    let output = [Language::Empty];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_a() {
-    check_result(&[Language::A], &[Language::A]);
+    let input = [Language::A];
+    let output = [Language::A];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_b() {
-    check_result(&[Language::B], &[Language::B]);
+    let input = [Language::B];
+    let output = [Language::B];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_ab() {
-    check_result(&[Language::A, Language::B], &[Language::B, Language::A]);
+    let input = [Language::A, Language::B];
+    let output = [Language::B, Language::A];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_baa() {
-    check_result(
-        &[Language::B, Language::A, Language::A],
-        &[Language::A, Language::A, Language::B],
-    );
+    let input = [Language::B, Language::A, Language::A];
+    let output = [Language::A, Language::A, Language::B];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_abba() {
-    check_result(
-        &[Language::A, Language::B, Language::B, Language::A],
-        &[Language::A, Language::B, Language::B, Language::A],
-    );
+    let input = [Language::A, Language::B, Language::B, Language::A];
+    let output = [Language::A, Language::B, Language::B, Language::A];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }
 
 #[test]
 fn test_babbb() {
-    check_result(
-        &[
-            Language::B,
-            Language::A,
-            Language::B,
-            Language::B,
-            Language::B,
-        ],
-        &[
-            Language::B,
-            Language::A,
-            Language::B,
-            Language::B,
-            Language::B,
-        ],
-    );
+    let input = [
+        Language::B,
+        Language::A,
+        Language::B,
+        Language::B,
+        Language::B,
+    ];
+    let output = [
+        Language::B,
+        Language::A,
+        Language::B,
+        Language::B,
+        Language::B,
+    ];
+    check_result(Tape::from(input.as_slice()), &Tape::from(output.as_slice()));
 }

@@ -42,9 +42,7 @@ impl<L: Language> TuringMachine<L> {
         let direction = transition.direction;
         let to = transition.to;
 
-        println!("{}, {}", self.tape_head, self.tape.get_capacity());
         self.tape.write_single(self.tape_head, write);
-        println!("AAA");
 
         // Ensure that we cannot move off the tape.
         if direction == Direction::Left && self.tape_head == 0 {
@@ -60,13 +58,13 @@ impl<L: Language> TuringMachine<L> {
     }
 
     /// # Errors
-    pub fn run(&mut self) -> Result<(&[L], usize), Error> {
+    pub fn run(&mut self) -> Result<(&Tape<L>, usize), Error> {
         // Loop until it ends up in a final state.
         while self.state != 1 {
             self.step()?;
         }
 
         // Return the result
-        Ok((self.tape.read_slice(0, self.tape.get_length()), self.steps))
+        Ok((&self.tape, self.steps))
     }
 }

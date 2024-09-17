@@ -73,12 +73,25 @@ impl<L: Language> Tape<L> {
     #[must_use]
     pub fn get_length(&self) -> usize {
         // Loop from the back until the first non-empty symbol is found.
-        let first_valid_index = (0..self.get_capacity())
+        (0..self.get_capacity())
             .rev()
             .find(|&idx| self.read_single(idx) != L::empty())
-            .unwrap_or(1);
+            .map_or(0, |idx| idx + 1) // Add one to convert from idx to length
+    }
+}
 
-        // Add 1 to conert from index to count
-        first_valid_index + 1
+impl<L: Language> PartialEq for Tape<L> {
+    fn eq(&self, other: &Self) -> bool {
+        let var_name =
+            self.read_slice(0, self.get_length()) == other.read_slice(0, other.get_length());
+        var_name
+    }
+}
+
+impl<L: Language> From<&[L]> for Tape<L> {
+    fn from(value: &[L]) -> Self {
+        let mut tape = Self::new();
+        tape.set_tape(value);
+        tape
     }
 }
