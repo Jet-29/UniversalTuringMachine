@@ -1,8 +1,7 @@
 use universal_turing_machine::{
-    tape::Tape,
+    tape::{Direction, Tape},
     transition::{Table, Transition},
     turing_machine::TuringMachine,
-    Direction,
 };
 
 #[derive(Copy, Clone, PartialEq, Debug)]

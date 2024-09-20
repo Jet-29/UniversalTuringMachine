@@ -6,6 +6,7 @@ use std::fmt::Display;
 /// # Error
 ///
 /// A structure to hold all key details about the error that occured.
+#[derive(Debug)]
 pub struct Error {
     error_type: Type,
 }
@@ -24,6 +25,7 @@ impl Display for Error {
 }
 
 /// Type of error that occured.
+#[derive(Debug)]
 pub enum Type {
     NonDeterministic,
     NoStateFound,

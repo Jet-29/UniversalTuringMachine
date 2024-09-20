@@ -1,14 +1,13 @@
 use crate::{
-    error::{self, Error},
+    error::Error,
     language::Language,
-    tape::Tape,
+    tape::{Location, Tape},
     transition::Table,
-    Direction,
 };
 
 #[derive(Default)]
 pub struct TuringMachine<L: Language> {
-    tape_head: usize,
+    tape_head: Location,
     steps: usize,
     state: usize,
     table: Table<L>,
@@ -19,7 +18,7 @@ impl<L: Language> TuringMachine<L> {
     #[must_use]
     pub fn new(table: Table<L>, tape: Tape<L>) -> Self {
         Self {
-            tape_head: 0,
+            tape_head: Location::new(),
             state: 0,
             steps: 0,
             table,
@@ -31,7 +30,7 @@ impl<L: Language> TuringMachine<L> {
     pub fn step(&mut self) -> Result<(), Error> {
         self.steps += 1;
         // Get value at current position/
-        let current_value: L = self.tape.read_single(self.tape_head);
+        let current_value: L = self.tape.read_location(&self.tape_head)?;
 
         // Using the current state and value, get the transition.
         let transition = self
@@ -42,16 +41,8 @@ impl<L: Language> TuringMachine<L> {
         let direction = transition.direction;
         let to = transition.to;
 
-        self.tape.write_single(self.tape_head, write);
-
-        // Ensure that we cannot move off the tape.
-        if direction == Direction::Left && self.tape_head == 0 {
-            return Err(Error::new(error::Type::EndOfTapeReached));
-        }
-        match direction {
-            Direction::Left => self.tape_head -= 1,
-            Direction::Right => self.tape_head += 1,
-        };
+        self.tape.write_location(&self.tape_head, write)?;
+        self.tape_head.move_direction(direction);
 
         self.state = to;
         Ok(())

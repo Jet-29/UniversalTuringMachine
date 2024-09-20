@@ -1,7 +1,7 @@
 use crate::{
     error::{self, Error},
     language::Language,
-    Direction,
+    tape::Direction,
 };
 
 /// # Transition Table
